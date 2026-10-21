@@ -29,8 +29,11 @@ beschenkte Person sieht, was schon besorgt wurde.
   Annahme) oder *geheim* (für alle außer der beschenkten Person sichtbar).
 - **Öffentlicher Link** – pro Liste zuschaltbar und jederzeit erneuerbar; Gäste reservieren ohne
   Konto mit ihrem Namen.
-- **Link einfügen genügt** – Titel, Bild, Preis und Beschreibung werden im Hintergrund aus der
-  Shopseite gelesen (strukturierte Daten, OpenGraph, Amazon). Selbst eingetragene Felder bleiben.
+- **Link einfügen genügt** – oben auf der eigenen Liste reicht ein Shop-Link: Name, Bild, Preis
+  und Beschreibung kommen aus der Shopseite (strukturierte Daten, OpenGraph, Amazon), was nicht
+  gefunden wird, bleibt leer. Im ausführlichen Formular (auch beim Kinder-Link) werden die Felder
+  schon beim Einfügen des Links gefüllt, sodass man vor dem Speichern sieht, was gefunden wurde.
+  Selbst eingetragene Felder bleiben unangetastet; „Neu einlesen“ holt alles neu aus dem Link.
 - **Affiliate** – Amazon-Links bekommen beim Anzeigen den eigenen Partner-Tag
   (`WISHLY_AMAZON_TAG`); gespeichert wird der Link unverändert.
 - **Preisvergleich** – ein Link zur Preissuche bei idealo.

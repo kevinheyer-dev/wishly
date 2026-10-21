@@ -4,7 +4,7 @@
 <section class="card narrow">
   <h1>{% block heading %}{{ heading }}{% endblock %}</h1>
   {% block intro %}{% endblock %}
-  <form method="post" class="form" novalidate>
+  <form method="post" class="form" novalidate {% block form_attrs %}{% endblock %}>
     {% csrf_token %}
     {% block fields %}{% if form %}{{ form }}{% endif %}{% endblock %}
     <div class="actions">

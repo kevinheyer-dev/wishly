@@ -10,6 +10,8 @@ urlpatterns = [
     path("listen/<int:pk>/loeschen/", views.wishlist_delete, name="wishlist_delete"),
     path("listen/<int:pk>/link-erneuern/", views.wishlist_new_link, name="wishlist_new_link"),
     path("listen/<int:pk>/wunsch/neu/", views.product_create, name="product_create"),
+    path("listen/<int:pk>/wunsch/link/", views.product_quick_add, name="product_quick_add"),
+    path("link-vorschau/", views.link_preview, name="link_preview"),
     path("wuensche/<int:pk>/bearbeiten/", views.product_edit, name="product_edit"),
     path("wuensche/<int:pk>/loeschen/", views.product_delete, name="product_delete"),
     path("wuensche/<int:pk>/neu-einlesen/", views.product_rescrape, name="product_rescrape"),
@@ -26,6 +28,7 @@ urlpatterns = [
     path("kind/<str:token>/wuensche/<int:pk>/bearbeiten/", child_views.child_product_edit, name="child_product_edit"),
     path("kind/<str:token>/wuensche/<int:pk>/loeschen/", child_views.child_product_delete,
          name="child_product_delete"),
+    path("kind/<str:token>/link-vorschau/", child_views.child_link_preview, name="child_link_preview"),
     path("kind/<str:token>/wuensche/<int:pk>/status/", child_views.child_product_status,
          name="child_product_status"),
 ]

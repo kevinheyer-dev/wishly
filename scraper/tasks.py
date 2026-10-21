@@ -10,6 +10,12 @@ from .parse import parse_product
 logger = logging.getLogger(__name__)
 
 
+def scrape_url(url):
+    """Product data for a shop link; raises FetchError when the page cannot be loaded."""
+    final_url, html = fetch_html(url)
+    return parse_product(html, final_url)
+
+
 @shared_task
 def scrape_product(product_id, overwrite=False):
     """Fill in product data from its shop page. Fields the user typed stay unless overwrite is set."""
@@ -17,8 +23,7 @@ def scrape_product(product_id, overwrite=False):
     if product is None or not product.shop_url:
         return
     try:
-        _final_url, html = fetch_html(product.shop_url)
-        data = parse_product(html, product.shop_url)
+        data = scrape_url(product.shop_url)
     except FetchError as exc:
         Product.objects.filter(pk=product_id).update(
             scrape_status=Product.ScrapeStatus.FAILED, scrape_error=str(exc)[:300]

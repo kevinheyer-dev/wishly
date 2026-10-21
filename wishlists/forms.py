@@ -45,6 +45,10 @@ class ProductForm(forms.ModelForm):
         return data
 
 
+class QuickAddForm(forms.Form):
+    shop_url = forms.URLField(max_length=2000)
+
+
 class ChildProductForm(ProductForm):
     """Fewer fields and simpler words for children adding wishes through their link."""
 

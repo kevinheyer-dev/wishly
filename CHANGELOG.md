@@ -18,4 +18,6 @@
   Erziehungsberechtigten pro Kind einstellbar.
 - Öffentlicher Link pro Liste; Gäste reservieren ohne Konto.
 - Produktdaten werden aus dem Shop-Link gelesen (im Hintergrund über Celery).
+- Wunsch nur per Link anlegen; im Formular werden Name, Bild, Preis und Beschreibung schon beim
+  Einfügen des Links ausgefüllt. „Neu einlesen“ übernimmt alle Angaben neu aus dem Link.
 - Amazon-Links bekommen auf Wunsch den eigenen Partner-Tag; Link zum Preisvergleich.

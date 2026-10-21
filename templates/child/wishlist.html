@@ -9,7 +9,7 @@
 
 <section class="card">
   <h2>✨ Neuer Wunsch</h2>
-  <form method="post" class="form" novalidate>
+  <form method="post" class="form" novalidate data-link-preview="{% url 'child_link_preview' token %}">
     {% csrf_token %}
     {{ form }}
     <div class="actions"><button class="btn primary">Auf meine Liste!</button></div>

@@ -173,7 +173,7 @@ class WishlistViewTests(FamilyTestCase):
             })
         product = Product.objects.get(shop_url="https://shop.example/p/1")
         self.assertEqual(product.scrape_status, Product.ScrapeStatus.PENDING)
-        scrape.delay.assert_called_once_with(product.pk)
+        scrape.delay.assert_called_once_with(product.pk, False)
 
     def test_theme_resolution(self):
         wishlist = Wishlist(event_type=Wishlist.EventType.OTHER, event_date=datetime.date(2027, 7, 1))

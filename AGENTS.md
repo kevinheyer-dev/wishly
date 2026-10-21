@@ -38,7 +38,7 @@ uv run python manage.py send_birthday_reminders         # cron alternative to Ce
 - `wishlists/` – `Wishlist`, `Product` (a wish), `Reservation`; **all visibility rules live in
   `wishlists/access.py`** – views never decide on their own who sees what
 - `scraper/` – `fetch.py` (SSRF-safe download), `parse.py` (JSON-LD → shop selectors → OpenGraph),
-  `tasks.py` (Celery task), `affiliate.py` (tags added at render time via the `affiliate` filter)
+  `tasks.py` (`scrape_url` for the live form preview, Celery task for saved products), `affiliate.py` (tags added at render time via the `affiliate` filter)
 - `templates/` – `base.html`, `form_page.html` (generic form page), one folder per app
 - `config/` – settings (all environment-driven), `celery.py`
 

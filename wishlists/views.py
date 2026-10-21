@@ -1,6 +1,7 @@
 import logging
 import uuid
 
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -13,10 +14,11 @@ from django.views.decorators.http import require_POST
 
 from accounts.models import Profile
 from accounts.reminders import upcoming_birthdays
-from scraper.tasks import scrape_product
+from scraper.fetch import FetchError
+from scraper.tasks import scrape_product, scrape_url
 
 from . import access
-from .forms import GuestReservationForm, ProductForm, ReservationForm, SuggestionForm, WishlistForm
+from .forms import GuestReservationForm, ProductForm, QuickAddForm, ReservationForm, SuggestionForm, WishlistForm
 from .models import Product, Reservation, Wishlist
 
 logger = logging.getLogger(__name__)
@@ -46,14 +48,18 @@ def _product_rows(products, *, user=None, guest_key=None, show_reservations=True
     return rows
 
 
-def _start_scraping(product):
+def _start_scraping(product, overwrite=False):
+    """Fetch missing data from the shop link in the background – unless the form already brought it."""
+    complete = product.title and product.image_url and product.price is not None
+    if not product.shop_url or (complete and not overwrite):
+        return
     product.scrape_status = Product.ScrapeStatus.PENDING
     product.scrape_error = ""
     product.save(update_fields=["scrape_status", "scrape_error"])
 
     def enqueue():
         try:
-            scrape_product.delay(product.pk)
+            scrape_product.delay(product.pk, overwrite)
         except Exception:
             logger.exception("Could not queue scraping of product %s", product.pk)
             Product.objects.filter(pk=product.pk).update(
@@ -61,6 +67,27 @@ def _start_scraping(product):
             )
 
     transaction.on_commit(enqueue)
+
+
+def link_preview_response(url):
+    """JSON with what a shop link yields, for filling in the product form before saving."""
+    try:
+        url = forms.URLField().clean(url)
+        data = scrape_url(url)
+    except forms.ValidationError:
+        return JsonResponse({"error": "Das ist kein gültiger Link."}, status=400)
+    except FetchError as exc:
+        return JsonResponse({"error": str(exc)}, status=422)
+    except Exception:
+        logger.exception("Link preview for %s failed", url)
+        return JsonResponse({"error": "Die Seite konnte nicht ausgewertet werden."}, status=422)
+    data["price"] = str(data["price"]) if data["price"] is not None else ""
+    return JsonResponse(data)
+
+
+@login_required
+def link_preview(request):
+    return link_preview_response(request.GET.get("url", ""))
 
 
 def dashboard(request):
@@ -177,8 +204,7 @@ def product_create(request, pk):
             if not is_editor:
                 product.suggested_by = request.user
             product.save()
-            if product.shop_url:
-                _start_scraping(product)
+            _start_scraping(product)
         if is_editor:
             messages.success(request, "Wunsch hinzugefügt.")
         else:
@@ -188,6 +214,22 @@ def product_create(request, pk):
         "form": form, "wishlist": wishlist, "is_suggestion": not is_editor,
         "theme": wishlist.resolved_theme(),
     })
+
+
+@login_required
+@require_POST
+def product_quick_add(request, pk):
+    """Only a link – everything else comes from the shop page."""
+    wishlist = _wishlist_for_editor(request, pk)
+    form = QuickAddForm(request.POST)
+    if not form.is_valid():
+        messages.error(request, "Bitte einen gültigen Link einfügen.")
+        return redirect(wishlist)
+    with transaction.atomic():
+        product = Product.objects.create(wishlist=wishlist, shop_url=form.cleaned_data["shop_url"])
+        _start_scraping(product)
+    messages.success(request, "Wunsch hinzugefügt – die Angaben werden aus dem Link geholt.")
+    return redirect(wishlist)
 
 
 def _product_for_editor(request, pk):
@@ -210,7 +252,7 @@ def product_edit(request, pk):
     if form.is_valid():
         with transaction.atomic():
             product = form.save()
-            if product.shop_url and product.shop_url != old_url:
+            if product.shop_url != old_url:
                 _start_scraping(product)
         messages.success(request, "Gespeichert.")
         return redirect(product.wishlist)
@@ -240,7 +282,7 @@ def product_rescrape(request, pk):
     product = _product_for_editor(request, pk)
     if product.shop_url:
         with transaction.atomic():
-            _start_scraping(product)
+            _start_scraping(product, overwrite=True)
     return redirect(product.wishlist)
 
 

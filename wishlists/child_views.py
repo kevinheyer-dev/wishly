@@ -10,7 +10,7 @@ from accounts.models import Profile
 from . import access
 from .forms import ChildProductForm
 from .models import Product
-from .views import _product_rows, _start_scraping
+from .views import _product_rows, _start_scraping, link_preview_response
 
 
 def _child_profile(token):
@@ -45,8 +45,7 @@ def child_wishlist(request, token, pk):
             if profile.child_approval_required:
                 product.visibility = Product.Visibility.PENDING
             product.save()
-            if product.shop_url:
-                _start_scraping(product)
+            _start_scraping(product)
         if product.visibility == Product.Visibility.PENDING:
             messages.success(request, f"„{product}“ ist notiert – deine Eltern schauen es sich noch an.")
         else:
@@ -70,7 +69,7 @@ def child_product_edit(request, token, pk):
     if form.is_valid():
         with transaction.atomic():
             product = form.save()
-            if product.shop_url and product.shop_url != old_url:
+            if product.shop_url != old_url:
                 _start_scraping(product)
         messages.success(request, "Gespeichert.")
         return redirect("child_wishlist", token, product.wishlist_id)
@@ -94,3 +93,8 @@ def child_product_delete(request, token, pk):
 def child_product_status(request, token, pk):
     _profile, product = _child_product(token, pk)
     return JsonResponse({"status": product.scrape_status})
+
+
+def child_link_preview(request, token):
+    _child_profile(token)
+    return link_preview_response(request.GET.get("url", ""))

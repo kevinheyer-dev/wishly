@@ -109,3 +109,14 @@ class SelectorTests(SimpleTestCase):
         self.assertEqual(data["title"], "Ein Buch")
         self.assertEqual(data["image_url"], "https://m.media-amazon.com/big.jpg")
         self.assertEqual(data["price"], Decimal("9.99"))
+
+
+class OverwriteTests(TestCase):
+    @mock.patch("scraper.tasks.fetch_html", return_value=("https://shop.example/p/1", JSON_LD_PAGE))
+    def test_overwrite_replaces_typed_fields(self, _fetch):
+        user = User.objects.create_user("anna", password="pw")
+        wishlist = Wishlist.objects.create(profile=user.profile, title="Liste")
+        product = Product.objects.create(wishlist=wishlist, shop_url="https://shop.example/p/1", title="Alt")
+        scrape_product(product.pk, overwrite=True)
+        product.refresh_from_db()
+        self.assertEqual(product.title, "Kaffeemühle")
