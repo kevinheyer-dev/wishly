@@ -1,0 +1,5 @@
+{% extends "form_page.html" %}
+{% block title %}{% if profile %}{{ profile.name }} bearbeiten{% else %}Kinderprofil anlegen{% endif %}{% endblock %}
+{% block heading %}{% if profile %}{{ profile.name }} bearbeiten{% else %}Kinderprofil in „{{ group.name }}“{% endif %}{% endblock %}
+{% block cancel %}<a class="btn" href="{% if profile %}{{ profile.get_absolute_url }}{% else %}{{ group.get_absolute_url }}{% endif %}">Abbrechen</a>{% endblock %}
+{% block after %}{% if profile %}<p><a class="danger-link" href="{% url 'child_delete' profile.pk %}">Profil löschen</a></p>{% endif %}{% endblock %}

@@ -1,0 +1,10 @@
+{% autoescape off %}Hallo {{ user }},
+
+{{ profile.display_name }} hat in {{ days }} Tag{{ days|pluralize:"en" }} Geburtstag ({{ birthday|date:"l, j. F" }}).
+
+Wunschlisten und Ideen findest du hier:
+{{ url }}
+
+Viele Grüße
+wishly
+{% endautoescape %}

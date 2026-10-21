@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load wishly %}
+{% block title %}{{ wishlist.title }}{% endblock %}
+{% block content %}
+<section class="list-hero">
+  <span class="list-kind">{{ wishlist.get_event_type_display }}{% if wishlist.event_date %} · {{ wishlist.event_date|date:"l, j. F Y" }}{% endif %}</span>
+  <h1>{{ wishlist.title }}</h1>
+  <p>für <a href="{{ wishlist.profile.get_absolute_url }}">{{ wishlist.profile }}</a></p>
+  {% if wishlist.description %}<p>{{ wishlist.description|linebreaksbr }}</p>{% endif %}
+  <div class="actions">
+    <a class="btn primary" href="{% url 'product_create' wishlist.pk %}">{% if can_edit %}+ Wunsch hinzufügen{% else %}💡 Wunsch vorschlagen{% endif %}</a>
+    {% if can_edit %}<a class="btn" href="{% url 'wishlist_edit' wishlist.pk %}">Liste bearbeiten</a>{% endif %}
+  </div>
+</section>
+
+{% if is_recipient %}
+<p class="message message-info">🤫 Überraschungsschutz: Du siehst nicht, was schon reserviert oder gekauft wurde.</p>
+{% endif %}
+
+{% if can_edit and wishlist.public_enabled %}
+<section class="card">
+  <h2>Öffentlicher Link</h2>
+  <p class="muted">Für alle außerhalb der Familie – sie können ohne Konto reservieren. Geheime Vorschläge erscheinen dort nicht.</p>
+  <div class="copy-row">
+    <input type="text" readonly value="{{ public_url }}" id="public-url">
+    <button class="btn" type="button" data-copy="#public-url">Kopieren</button>
+  </div>
+  <form method="post" action="{% url 'wishlist_new_link' wishlist.pk %}" data-confirm="Der bisherige Link funktioniert danach nicht mehr. Fortfahren?">
+    {% csrf_token %}<button class="link">Neuen Link erzeugen</button>
+  </form>
+</section>
+{% endif %}
+
+{% if suggestions %}
+<section class="card suggestions">
+  <h2>💡 Vorschläge</h2>
+  {% for p in suggestions %}
+  <div class="row">
+    <div class="grow">
+      <strong>{{ p.display_title }}</strong>{% if p.price is not None %} · {{ p.price|money:p.currency }}{% endif %}
+      <span class="muted">von {{ p.suggested_by|default:"jemandem" }}</span>
+      {% if p.shop_url %}<a href="{{ p.shop_url|affiliate }}" target="_blank" rel="noopener noreferrer sponsored">ansehen ↗</a>{% endif %}
+    </div>
+    {% if can_edit %}
+    <form method="post" action="{% url 'suggestion_decide' p.pk 'annehmen' %}">{% csrf_token %}<button class="btn small primary">Übernehmen</button></form>
+    <form method="post" action="{% url 'suggestion_decide' p.pk 'ablehnen' %}">{% csrf_token %}<button class="btn small">Ablehnen</button></form>
+    {% else %}
+    <span class="badge">wartet auf Bestätigung</span>
+    <a href="{% url 'product_edit' p.pk %}">Bearbeiten</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<section class="products">
+  {% for row in rows %}
+  {% include "wishlists/_product_card.html" %}
+  {% empty %}
+  <div class="card empty"><p>Diese Liste ist noch leer.{% if can_edit %} Füge einen Link aus einem beliebigen Shop ein – Bild und Preis holen wir automatisch.{% endif %}</p></div>
+  {% endfor %}
+</section>
+{% endblock %}

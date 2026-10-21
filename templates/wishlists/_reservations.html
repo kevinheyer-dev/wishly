@@ -1,0 +1,47 @@
+{# Reservation part of a product card. Needs row, show_reservations; public_mode/wishlist for the public page. #}
+{% if show_reservations and row.product.visibility != "pending" %}
+<div class="reservation">
+  <p class="availability">
+    {% if row.open %}<span class="badge ok">{{ row.open }} von {{ row.product.quantity_desired }} frei</span>
+    {% else %}<span class="badge done">Vergeben</span>{% endif %}
+    {% if not public_mode %}
+      {% for r in row.reservations %}{% if r != row.mine %}
+      <span class="badge">{{ r.reserver_name }}: {{ r.quantity }}× {{ r.get_status_display }}</span>
+      {% endif %}{% endfor %}
+    {% endif %}
+  </p>
+
+  {% if row.mine %}
+    <p><strong>Du:</strong> {{ row.mine.quantity }}× {{ row.mine.get_status_display }}</p>
+    {% if user.is_authenticated %}
+    <form method="post" class="inline-form"
+          action="{% if public_mode %}{% url 'public_reserve' wishlist.public_id row.product.pk %}{% else %}{% url 'reserve' row.product.pk %}{% endif %}">
+      {% csrf_token %}
+      <input type="number" name="quantity" value="{{ row.mine.quantity }}" min="1" max="{{ row.mine.quantity|add:row.open }}" aria-label="Anzahl">
+      <select name="status" aria-label="Status">
+        <option value="reserved"{% if row.mine.status == "reserved" %} selected{% endif %}>Reserviert</option>
+        <option value="purchased"{% if row.mine.status == "purchased" %} selected{% endif %}>Gekauft / erhalten</option>
+      </select>
+      <button class="btn small">Ändern</button>
+    </form>
+    <form method="post" action="{% url 'reservation_delete' row.mine.pk %}">
+      {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="link danger-link">Reservierung aufheben</button>
+    </form>
+    {% else %}
+    <form method="post" action="{% url 'public_unreserve' wishlist.public_id row.mine.pk %}">
+      {% csrf_token %}<button class="link danger-link">Reservierung aufheben</button>
+    </form>
+    {% endif %}
+  {% elif row.open %}
+    <form method="post" class="inline-form"
+          action="{% if public_mode %}{% url 'public_reserve' wishlist.public_id row.product.pk %}{% else %}{% url 'reserve' row.product.pk %}{% endif %}">
+      {% csrf_token %}
+      {% if not user.is_authenticated %}<input type="text" name="guest_name" placeholder="Dein Name" required aria-label="Dein Name">{% endif %}
+      {% if row.open > 1 %}<input type="number" name="quantity" value="1" min="1" max="{{ row.open }}" aria-label="Anzahl">
+      {% else %}<input type="hidden" name="quantity" value="1">{% endif %}
+      <button class="btn small primary" name="status" value="reserved">Reservieren</button>
+      {% if user.is_authenticated %}<button class="btn small" name="status" value="purchased">Schon gekauft</button>{% endif %}
+    </form>
+  {% endif %}
+</div>
+{% endif %}

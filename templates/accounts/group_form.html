@@ -1,0 +1,6 @@
+{% extends "form_page.html" %}
+{% block title %}{% if group %}Familie bearbeiten{% else %}Familie anlegen{% endif %}{% endblock %}
+{% block heading %}{% if group %}Familie bearbeiten{% else %}Familie anlegen{% endif %}{% endblock %}
+{% block intro %}{% if not group %}<p class="muted">Zum Beispiel „Familie Heyer“ oder „Weihnachten bei Oma“. Du wirst Administrator und kannst danach Mitglieder einladen.</p>{% endif %}{% endblock %}
+{% block cancel %}<a class="btn" href="{% if group %}{{ group.get_absolute_url }}{% else %}{% url 'group_list' %}{% endif %}">Abbrechen</a>{% endblock %}
+{% block after %}{% if group %}<p><a class="danger-link" href="{% url 'group_delete' group.pk %}">Familie löschen</a></p>{% endif %}{% endblock %}

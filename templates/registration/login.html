@@ -1,0 +1,7 @@
+{% extends "form_page.html" %}
+{% block title %}Anmelden{% endblock %}
+{% block heading %}Anmelden{% endblock %}
+{% block submit %}Anmelden{% endblock %}
+{% block after %}<p class="muted"><a href="{% url 'password_reset' %}">Passwort vergessen?</a>{% if allow_signup %} · <a href="{% url 'signup' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">Neu hier? Registrieren</a>{% endif %}</p>{% endblock %}
+{% block fields %}{{ form }}<input type="hidden" name="next" value="{{ next }}">{% endblock %}
+{% block cancel %}{% endblock %}

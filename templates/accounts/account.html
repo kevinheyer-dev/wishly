@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Konto{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Dein Konto</h1>
+  <p class="muted">Angemeldet als <strong>{{ user.username }}</strong> · <a href="{% url 'profile_detail' user.profile.pk %}">Dein Profil ansehen</a></p>
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    <h2>Persönliches</h2>
+    {{ account_form }}
+    <h2>Geburtstag</h2>
+    <p class="muted">Tag und Monat genügen – deine Familie wird rechtzeitig erinnert.</p>
+    {{ profile_form }}
+    <div class="actions">
+      <button class="btn primary">Speichern</button>
+      <a class="btn" href="{% url 'password_change' %}">Passwort ändern</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

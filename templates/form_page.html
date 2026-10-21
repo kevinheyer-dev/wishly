@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>{% block heading %}{{ heading }}{% endblock %}</h1>
+  {% block intro %}{% endblock %}
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    {% block fields %}{% if form %}{{ form }}{% endif %}{% endblock %}
+    <div class="actions">
+      <button class="btn primary">{% block submit %}Speichern{% endblock %}</button>
+      {% block cancel %}<a class="btn" href="{{ cancel_url|default:'/' }}">Abbrechen</a>{% endblock %}
+    </div>
+  </form>
+  {% block after %}{% endblock %}
+</section>
+{% endblock %}

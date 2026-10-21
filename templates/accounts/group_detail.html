@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <h1>{{ group.name }}</h1>
+  {% if is_admin %}<a class="btn" href="{% url 'group_edit' group.pk %}">Bearbeiten</a>{% endif %}
+</div>
+
+<section class="card">
+  <h2>Mitglieder einladen</h2>
+  <p class="muted">Wer diesen Link öffnet und ein Konto hat (oder anlegt), kann der Familie beitreten.</p>
+  <div class="copy-row">
+    <input type="text" readonly value="{{ invite_url }}" id="invite-url">
+    <button class="btn" type="button" data-copy="#invite-url">Kopieren</button>
+  </div>
+  {% if is_admin %}
+  <form method="post" action="{% url 'group_new_invite' group.pk %}">
+    {% csrf_token %}<button class="link">Neuen Link erzeugen (alter wird ungültig)</button>
+  </form>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Mitglieder</h2>
+  <ul class="rows">
+    {% for m in memberships %}
+    <li class="row">
+      <div class="grow">
+        <a href="{% url 'profile_detail' m.user.profile.pk %}">{{ m.user }}</a>
+        <span class="badge">{{ m.get_role_display }}</span>
+      </div>
+      {% if is_admin and m.user != user %}
+      <form method="post" action="{% url 'member_role' group.pk m.pk %}">
+        {% csrf_token %}
+        {% if m.role == "admin" %}
+        <input type="hidden" name="role" value="member"><button class="link">Zum Mitglied machen</button>
+        {% else %}
+        <input type="hidden" name="role" value="admin"><button class="link">Zum Admin machen</button>
+        {% endif %}
+      </form>
+      <form method="post" action="{% url 'member_remove' group.pk m.pk %}" data-confirm="{{ m.user }} aus der Familie entfernen?">
+        {% csrf_token %}<button class="link danger-link">Entfernen</button>
+      </form>
+      {% elif m.user == user %}
+      <form method="post" action="{% url 'member_remove' group.pk m.pk %}" data-confirm="Familie „{{ group.name }}“ wirklich verlassen?">
+        {% csrf_token %}<button class="link danger-link">Verlassen</button>
+      </form>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Kinder</h2>
+    <a class="btn" href="{% url 'child_create' group.pk %}">+ Kinderprofil</a>
+  </div>
+  <p class="muted">Kinder brauchen kein eigenes Konto – ihre Erziehungsberechtigten pflegen die Listen.</p>
+  <ul class="rows">
+    {% for child in children %}
+    <li class="row">
+      <div class="grow"><a href="{{ child.get_absolute_url }}">{{ child.name }}</a>
+        <span class="muted">· betreut von {{ child.guardians.all|join:", " }}</span></div>
+    </li>
+    {% empty %}
+    <li class="muted">Noch keine Kinderprofile.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

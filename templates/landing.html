@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Wunschlisten für die ganze Familie{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Wünsche sammeln. Überraschungen bewahren.</h1>
+  <p>wishly ist die Wunschliste für Familie und Freunde: Listen für Geburtstag, Weihnachten oder Hochzeit,
+     Links einfügen und Bild und Preis kommen von allein – und wer etwas besorgt, verrät es dem Beschenkten nicht.</p>
+  <div class="actions">
+    {% if allow_signup %}<a class="btn primary" href="{% url 'signup' %}">Kostenlos registrieren</a>{% endif %}
+    <a class="btn" href="{% url 'login' %}">Anmelden</a>
+  </div>
+</section>
+<section class="features">
+  <div class="card"><h2>👨‍👩‍👧 Familien</h2><p>Lade deine Familie ein und verwalte auch die Listen eurer Kinder.</p></div>
+  <div class="card"><h2>🔗 Link einfügen</h2><p>Titel, Bild und Preis werden automatisch aus dem Shop übernommen.</p></div>
+  <div class="card"><h2>🤫 Überraschungsschutz</h2><p>Du siehst nie, was für dich reserviert oder gekauft wurde.</p></div>
+  <div class="card"><h2>🎂 Erinnerungen</h2><p>Rechtzeitig vor jedem Geburtstag kommt eine E-Mail.</p></div>
+</section>
+{% endblock %}

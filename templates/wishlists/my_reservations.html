@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load wishly %}
+{% block title %}Besorgungen{% endblock %}
+{% block content %}
+<h1>Deine Besorgungen</h1>
+<p class="muted">Alles, was du reserviert oder schon gekauft hast.</p>
+{% regroup reservations by get_status_display as groups %}
+{% for group in groups %}
+<section class="card">
+  <h2>{{ group.grouper }}</h2>
+  <ul class="rows">
+    {% for r in group.list %}
+    <li class="row">
+      <div class="grow">
+        <strong>{{ r.quantity }}× {{ r.product.display_title }}</strong>
+        {% if r.product.price is not None %}· {{ r.product.price|money:r.product.currency }}{% endif %}
+        <br><span class="muted">für {{ r.product.wishlist.profile }} – <a href="{{ r.product.wishlist.get_absolute_url }}">{{ r.product.wishlist.title }}</a>{% if r.product.wishlist.event_date %}, {{ r.product.wishlist.event_date|date:"j. b Y" }}{% endif %}</span>
+      </div>
+      {% if r.product.shop_url %}<a class="btn small" href="{{ r.product.shop_url|affiliate }}" target="_blank" rel="noopener noreferrer sponsored">Zum Shop</a>{% endif %}
+      {% if r.status == "reserved" %}
+      <form method="post" action="{% url 'reserve' r.product.pk %}">
+        {% csrf_token %}<input type="hidden" name="quantity" value="{{ r.quantity }}"><input type="hidden" name="status" value="purchased"><input type="hidden" name="next" value="{{ request.path }}">
+        <button class="btn small primary">Gekauft</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{% url 'reservation_delete' r.pk %}">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="link danger-link">Aufheben</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% empty %}
+<div class="card empty"><p>Du hast noch nichts reserviert.</p></div>
+{% endfor %}
+{% endblock %}

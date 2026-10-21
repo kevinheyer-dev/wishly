@@ -1,0 +1,44 @@
+{% load wishly %}
+{% with p=row.product %}
+<article class="product{% if p.visibility == 'secret' %} secret{% endif %}{% if show_reservations and not row.open and row.reserved is not None %} taken{% endif %}"
+         {% if p.scrape_status == "pending" and not public_mode %}data-status-url="{% url 'product_status' p.pk %}"{% endif %}>
+  <div class="product-image">
+    {% if p.image_url %}<img src="{{ p.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer">
+    {% else %}<span class="placeholder">🎁</span>{% endif %}
+  </div>
+  <div class="product-body">
+    <header>
+      <h3>
+        {% if p.shop_url %}<a href="{{ p.shop_url|affiliate }}" target="_blank" rel="noopener noreferrer sponsored">{{ p.display_title }}</a>
+        {% else %}{{ p.display_title }}{% endif %}
+      </h3>
+      {{ p.priority|stars }}
+    </header>
+    <p class="meta">
+      {% if p.price is not None %}<strong class="price">{{ p.price|money:p.currency }}</strong>{% endif %}
+      {% if p.quantity_desired > 1 %}<span>{{ p.quantity_desired }}× gewünscht</span>{% endif %}
+      {% if p.visibility == "secret" %}<span class="badge secret">🤫 Geheimer Vorschlag</span>{% endif %}
+      {% if p.suggested_by and not is_recipient %}<span class="muted">Idee von {{ p.suggested_by }}</span>{% endif %}
+      {% if p.scrape_status == "pending" %}<span class="badge loading">Produktdaten werden geladen …</span>{% endif %}
+      {% if p.scrape_status == "failed" and can_edit %}<span class="badge warn" title="{{ p.scrape_error }}">Daten nicht gefunden</span>{% endif %}
+    </p>
+    {% if p.notes %}<p class="notes">📝 {{ p.notes|linebreaksbr }}</p>{% endif %}
+    {% if p.description %}<details><summary>Beschreibung</summary><p>{{ p.description|linebreaksbr }}</p></details>{% endif %}
+    {% if p.title and not is_recipient %}<p class="small"><a href="{{ p.title|price_search_url }}" target="_blank" rel="noopener noreferrer">Preise vergleichen ↗</a></p>{% endif %}
+
+    {% include "wishlists/_reservations.html" %}
+
+    {% if not public_mode %}
+    {% if can_edit or p.suggested_by == user and p.visibility != "visible" %}
+    <footer class="product-actions">
+      <a href="{% url 'product_edit' p.pk %}">Bearbeiten</a>
+      {% if p.shop_url %}
+      <form method="post" action="{% url 'product_rescrape' p.pk %}">{% csrf_token %}<button class="link">Neu einlesen</button></form>
+      {% endif %}
+      <a class="danger-link" href="{% url 'product_delete' p.pk %}">Entfernen</a>
+    </footer>
+    {% endif %}
+    {% endif %}
+  </div>
+</article>
+{% endwith %}

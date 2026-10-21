@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.display_name }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h1>{{ profile.display_name }}</h1>
+    <p class="muted">
+      {% if profile.birth_day %}🎂 {{ profile.birth_day }}. {{ profile.get_birth_month_display }}{% endif %}
+      {% if profile.is_child %} · Kinderprofil in {{ profile.family_group }}{% endif %}
+    </p>
+  </div>
+  <div class="actions">
+    {% if can_manage %}
+      <a class="btn primary" href="{% url 'wishlist_create' %}?profil={{ profile.pk }}">+ Neue Liste</a>
+      {% if profile.is_child %}<a class="btn" href="{% url 'child_edit' profile.pk %}">Bearbeiten</a>
+      {% else %}<a class="btn" href="{% url 'account' %}">Bearbeiten</a>{% endif %}
+    {% endif %}
+  </div>
+</div>
+<div class="grid">
+  {% for wishlist, count in wishlists %}
+  {% include "wishlists/_wishlist_card.html" %}
+  {% empty %}
+  <div class="card empty"><p>Noch keine Wunschlisten.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

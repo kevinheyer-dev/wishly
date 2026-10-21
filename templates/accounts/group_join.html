@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Einladung{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Einladung zu „{{ group.name }}“</h1>
+  <p>Als Mitglied siehst du die Wunschlisten der Familie und deine Familie sieht deine.</p>
+  <form method="post" class="actions">
+    {% csrf_token %}
+    <button class="btn primary">Beitreten</button>
+    <a class="btn" href="{% url 'dashboard' %}">Nein, danke</a>
+  </form>
+</section>
+{% endblock %}

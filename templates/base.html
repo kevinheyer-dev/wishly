@@ -1,0 +1,35 @@
+{% load static %}<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}wishly{% endblock %} · wishly</title>
+  <link rel="stylesheet" href="{% static 'css/wishly.css' %}">
+  <script src="{% static 'js/wishly.js' %}" defer></script>
+</head>
+<body class="theme-{% block theme %}{{ theme|default:season_theme }}{% endblock %}">
+  <header class="topbar">
+    <a class="brand" href="{% url 'dashboard' %}">🎁 wishly</a>
+    {% if user.is_authenticated %}
+    <nav class="nav">
+      <a href="{% url 'dashboard' %}">Übersicht</a>
+      <a href="{% url 'my_reservations' %}">Besorgungen</a>
+      <a href="{% url 'group_list' %}">Familien</a>
+      <a href="{% url 'account' %}">Konto</a>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Abmelden</button></form>
+    </nav>
+    {% else %}
+    <nav class="nav">
+      <a href="{% url 'login' %}">Anmelden</a>
+      {% if allow_signup %}<a href="{% url 'signup' %}">Registrieren</a>{% endif %}
+    </nav>
+    {% endif %}
+  </header>
+  <main class="page">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

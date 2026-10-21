@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Übersicht{% endblock %}
+{% block content %}
+<h1>Hallo {{ user.first_name|default:user.username }}!</h1>
+
+{% if not has_group %}
+<div class="card hint">
+  <p><strong>Erster Schritt:</strong> Lege eine Familie an und lade deine Liebsten ein – oder öffne den Einladungslink, den du bekommen hast.</p>
+  <a class="btn primary" href="{% url 'group_create' %}">Familie anlegen</a>
+</div>
+{% endif %}
+
+{% if pending_suggestions %}
+<div class="card hint">📬 Es gibt {{ pending_suggestions }} neue{{ pending_suggestions|pluralize:"n" }} Vorschl{{ pending_suggestions|pluralize:"ag,äge" }} für deine Listen – du findest sie oben auf der jeweiligen Liste.</div>
+{% endif %}
+
+<div class="dashboard">
+  <div>
+    <div class="section-head">
+      <h2>Deine Listen</h2>
+      <a class="btn primary" href="{% url 'wishlist_create' %}">+ Neue Liste</a>
+    </div>
+    <div class="grid">
+      {% for wishlist in my_lists %}
+      {% include "wishlists/_wishlist_card.html" with count=wishlist.n %}
+      {% empty %}
+      <div class="card empty"><p>Du hast noch keine Wunschliste.</p></div>
+      {% endfor %}
+    </div>
+
+    <h2>Listen deiner Familie</h2>
+    <div class="grid">
+      {% for wishlist in family_lists %}
+      {% include "wishlists/_wishlist_card.html" with count=wishlist.n %}
+      {% empty %}
+      <div class="card empty"><p>Hier erscheinen die Listen deiner Familienmitglieder.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside>
+    <section class="card">
+      <h2>🎂 Nächste Geburtstage</h2>
+      <ul class="rows">
+        {% for date, profile in birthdays %}
+        <li class="row"><a class="grow" href="{{ profile.get_absolute_url }}">{{ profile.display_name }}</a>
+          <span class="muted">{{ date|date:"j. b" }}</span></li>
+        {% empty %}
+        <li class="muted">Keine Geburtstage in den nächsten 60 Tagen.</li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="card">
+      <h2>🛍️ Besorgungen</h2>
+      <p>{% if open_reservations %}{{ open_reservations }} reservierte{{ open_reservations|pluralize:"r," }} Wunsch{{ open_reservations|pluralize:"e" }} noch nicht gekauft.{% else %}Nichts offen.{% endif %}</p>
+      <a href="{% url 'my_reservations' %}">Alle Reservierungen →</a>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Familien{% endblock %}
+{% block content %}
+<div class="section-head">
+  <h1>Deine Familien</h1>
+  <a class="btn primary" href="{% url 'group_create' %}">+ Familie anlegen</a>
+</div>
+{% for group in groups %}
+<a class="card link-card" href="{{ group.get_absolute_url }}">
+  <h2>{{ group.name }}</h2>
+  <p class="muted">{{ group.memberships.count }} Mitglied{{ group.memberships.count|pluralize:"er" }}{% if group.child_profiles.count %}, {{ group.child_profiles.count }} Kind{{ group.child_profiles.count|pluralize:"er" }}{% endif %}</p>
+</a>
+{% empty %}
+<div class="card empty">
+  <p>Du bist noch in keiner Familie. Lege eine an und teile den Einladungslink – oder öffne den Link, den dir jemand geschickt hat.</p>
+</div>
+{% endfor %}
+{% endblock %}

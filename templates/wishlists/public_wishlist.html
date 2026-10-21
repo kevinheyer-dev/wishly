@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ wishlist.title }}{% endblock %}
+{% block content %}
+<section class="list-hero">
+  <span class="list-kind">{{ wishlist.get_event_type_display }}{% if wishlist.event_date %} · {{ wishlist.event_date|date:"l, j. F Y" }}{% endif %}</span>
+  <h1>{{ wishlist.title }}</h1>
+  <p>Wunschliste von {{ wishlist.profile }}</p>
+  {% if wishlist.description %}<p>{{ wishlist.description|linebreaksbr }}</p>{% endif %}
+  {% if is_member %}<p><a href="{{ wishlist.get_absolute_url }}">Zur Familienansicht →</a></p>{% endif %}
+</section>
+{% if show_reservations %}
+<p class="message message-info">Reserviere, was du schenken möchtest – so bekommt niemand etwas doppelt. {{ wishlist.profile }} sieht das nicht.</p>
+{% else %}
+<p class="message message-info">🤫 Das ist deine eigene Liste – Reservierungen bleiben für dich unsichtbar.</p>
+{% endif %}
+<section class="products">
+  {% for row in rows %}
+  {% include "wishlists/_product_card.html" with public_mode=True can_edit=False %}
+  {% empty %}
+  <div class="card empty"><p>Diese Liste ist noch leer.</p></div>
+  {% endfor %}
+</section>
+{% endblock %}

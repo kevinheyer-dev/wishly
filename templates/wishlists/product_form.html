@@ -1,0 +1,6 @@
+{% extends "form_page.html" %}
+{% block title %}{% if product %}Wunsch bearbeiten{% elif is_suggestion %}Wunsch vorschlagen{% else %}Neuer Wunsch{% endif %}{% endblock %}
+{% block heading %}{% if product %}Wunsch bearbeiten{% elif is_suggestion %}Wunsch für {{ wishlist.profile }} vorschlagen{% else %}Neuer Wunsch{% endif %}{% endblock %}
+{% block intro %}<p class="muted">Liste: {{ wishlist.title }}</p>{% endblock %}
+{% block submit %}{% if is_suggestion %}Vorschlagen{% else %}Speichern{% endif %}{% endblock %}
+{% block cancel %}<a class="btn" href="{{ wishlist.get_absolute_url }}">Abbrechen</a>{% endblock %}
