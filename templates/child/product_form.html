@@ -1,0 +1,15 @@
+{% extends "child/base.html" %}
+{% block title %}Wunsch ändern{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Wunsch ändern</h1>
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    {{ form }}
+    <div class="actions">
+      <button class="btn primary">Speichern</button>
+      <a class="btn" href="{% url 'child_wishlist' token product.wishlist_id %}">Zurück</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -102,6 +102,12 @@ class Profile(models.Model):
     birth_month = models.PositiveSmallIntegerField(
         "Geburtstag (Monat)", null=True, blank=True, choices=MONTHS
     )
+    # Secret link through which a child adds wishes without an account; empty = switched off
+    child_token = models.CharField(max_length=40, unique=True, null=True, blank=True, editable=False)
+    child_approval_required = models.BooleanField(
+        "Wünsche des Kindes erst nach Freigabe zeigen", default=False,
+        help_text="Was das Kind über seinen Link einträgt, sieht die Familie erst, wenn du es übernimmst.",
+    )
     birthday_reminders = models.BooleanField(
         "Erinnerungen an Geburtstage per E-Mail", default=True,
         help_text="Gilt nur für Konten: Mails vor Geburtstagen deiner Familienmitglieder.",

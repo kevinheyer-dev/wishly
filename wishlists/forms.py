@@ -45,6 +45,28 @@ class ProductForm(forms.ModelForm):
         return data
 
 
+class ChildProductForm(ProductForm):
+    """Fewer fields and simpler words for children adding wishes through their link."""
+
+    class Meta(ProductForm.Meta):
+        fields = ("title", "shop_url", "priority", "quantity_desired", "notes")
+        labels = {
+            "title": "Was wünschst du dir?",
+            "shop_url": "Link (wenn du einen hast)",
+            "priority": "Wie sehr wünschst du es dir?",
+            "quantity_desired": "Wie viele?",
+            "notes": "Noch etwas wichtig? (Größe, Farbe …)",
+        }
+        widgets = {
+            "title": forms.TextInput(attrs={"autofocus": True}),
+            "shop_url": forms.URLInput(attrs={"placeholder": "https://…"}),
+            "priority": forms.Select(choices=[(5, "★★★★★ Ganz doll"), (4, "★★★★ Sehr"), (3, "★★★ Mittel"),
+                                              (2, "★★ Ein bisschen"), (1, "★ Wäre nett")]),
+            "notes": forms.Textarea(attrs={"rows": 2}),
+        }
+        help_texts = {"shop_url": "", "priority": ""}
+
+
 class SuggestionForm(ProductForm):
     visibility = forms.ChoiceField(
         label="Sichtbarkeit",

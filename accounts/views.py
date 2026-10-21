@@ -216,6 +216,8 @@ def profile_detail(request, pk):
         "profile": profile,
         "wishlists": wishlists,
         "can_manage": profile.can_manage(request.user),
+        "child_url": request.build_absolute_uri(reverse("child_home", args=[profile.child_token]))
+        if profile.child_token else None,
     })
 
 
@@ -233,6 +235,22 @@ def child_edit(request, pk):
         return redirect(profile)
     return render(request, "accounts/child_form.html",
                   {"form": form, "group": profile.family_group, "profile": profile})
+
+
+@login_required
+@require_POST
+def child_link(request, pk):
+    profile = _visible_profile(request, pk)
+    if not profile.is_child or not profile.can_manage(request.user):
+        raise PermissionDenied
+    if request.POST.get("action") == "disable":
+        profile.child_token = None
+        messages.success(request, "Der Kinder-Link ist abgeschaltet.")
+    else:
+        profile.child_token = new_invite_token()
+        messages.success(request, "Neuer Kinder-Link erstellt – ein bisheriger Link gilt nicht mehr.")
+    profile.save(update_fields=["child_token"])
+    return redirect(profile)
 
 
 @login_required

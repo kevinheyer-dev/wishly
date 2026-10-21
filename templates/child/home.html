@@ -1,0 +1,15 @@
+{% extends "child/base.html" %}
+{% block title %}Meine Wunschlisten{% endblock %}
+{% block content %}
+<h1>Deine Wunschlisten</h1>
+<div class="grid">
+  {% for wishlist in wishlists %}
+  <a class="card link-card list-card theme-{{ wishlist.resolved_theme }}" href="{% url 'child_wishlist' token wishlist.pk %}">
+    <span class="list-kind">{{ wishlist.get_event_type_display }}{% if wishlist.event_date %} · {{ wishlist.event_date|date:"j. F Y" }}{% endif %}</span>
+    <h2>{{ wishlist.title }}</h2>
+  </a>
+  {% empty %}
+  <div class="card empty"><p>Du hast noch keine Wunschliste. Frag deine Eltern, ob sie dir eine anlegen.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -14,6 +14,8 @@
 - Wünsche mit Titel, Beschreibung, Bild, Link, Preis, Priorität (1–5 Sterne), Anzahl und Notizen.
 - Reservieren und als gekauft markieren, inklusive Anzahl; Überraschungsschutz für Beschenkte.
 - Vorschläge von Familienmitgliedern: zur Bestätigung oder geheim.
+- Kinder-Link: Kinder tragen ohne Konto selbst Wünsche ein; Freigabe durch die
+  Erziehungsberechtigten pro Kind einstellbar.
 - Öffentlicher Link pro Liste; Gäste reservieren ohne Konto.
 - Produktdaten werden aus dem Shop-Link gelesen (im Hintergrund über Celery).
 - Amazon-Links bekommen auf Wunsch den eigenen Partner-Tag; Link zum Preisvergleich.

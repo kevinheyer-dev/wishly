@@ -38,7 +38,7 @@
   <div class="row">
     <div class="grow">
       <strong>{{ p.display_title }}</strong>{% if p.price is not None %} · {{ p.price|money:p.currency }}{% endif %}
-      <span class="muted">von {{ p.suggested_by|default:"jemandem" }}</span>
+      <span class="muted">{% if p.added_by_child %}von {{ wishlist.profile }} selbst eingetragen{% else %}von {{ p.suggested_by|default:"jemandem" }}{% endif %}</span>
       {% if p.shop_url %}<a href="{{ p.shop_url|affiliate }}" target="_blank" rel="noopener noreferrer sponsored">ansehen ↗</a>{% endif %}
     </div>
     {% if can_edit %}

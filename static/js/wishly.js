@@ -12,6 +12,12 @@ document.addEventListener("click", (event) => {
   });
 });
 
+// Confirmation for one of several buttons in a form
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-confirm-click]");
+  if (button && !window.confirm(button.dataset.confirmClick)) event.preventDefault();
+});
+
 document.addEventListener("submit", (event) => {
   const message = event.target.dataset.confirm;
   if (message && !window.confirm(message)) event.preventDefault();

@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block head %}<meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">{% endblock %}
+{% block brand_url %}{% url 'child_home' token %}{% endblock %}
+{% block nav %}<span class="muted">Hallo {{ profile.name|default:"du" }}! 👋</span>{% endblock %}

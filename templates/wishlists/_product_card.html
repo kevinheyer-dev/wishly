@@ -1,7 +1,8 @@
 {% load wishly %}
 {% with p=row.product %}
 <article class="product{% if p.visibility == 'secret' %} secret{% endif %}{% if show_reservations and not row.open and row.reserved is not None %} taken{% endif %}"
-         {% if p.scrape_status == "pending" and not public_mode %}data-status-url="{% url 'product_status' p.pk %}"{% endif %}>
+         {% if p.scrape_status == "pending" and child_mode %}data-status-url="{% url 'child_product_status' token p.pk %}"
+         {% elif p.scrape_status == "pending" and not public_mode %}data-status-url="{% url 'product_status' p.pk %}"{% endif %}>
   <div class="product-image">
     {% if p.image_url %}<img src="{{ p.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer">
     {% else %}<span class="placeholder">🎁</span>{% endif %}
@@ -18,7 +19,9 @@
       {% if p.price is not None %}<strong class="price">{{ p.price|money:p.currency }}</strong>{% endif %}
       {% if p.quantity_desired > 1 %}<span>{{ p.quantity_desired }}× gewünscht</span>{% endif %}
       {% if p.visibility == "secret" %}<span class="badge secret">🤫 Geheimer Vorschlag</span>{% endif %}
-      {% if p.suggested_by and not is_recipient %}<span class="muted">Idee von {{ p.suggested_by }}</span>{% endif %}
+      {% if p.visibility == "pending" %}<span class="badge">⏳ Wartet auf Freigabe</span>{% endif %}
+      {% if p.suggested_by and not is_recipient %}<span class="muted">Idee von {{ p.suggested_by }}</span>
+      {% elif p.added_by_child and not child_mode %}<span class="muted">selbst eingetragen</span>{% endif %}
       {% if p.scrape_status == "pending" %}<span class="badge loading">Produktdaten werden geladen …</span>{% endif %}
       {% if p.scrape_status == "failed" and can_edit %}<span class="badge warn" title="{{ p.scrape_error }}">Daten nicht gefunden</span>{% endif %}
     </p>
@@ -28,7 +31,14 @@
 
     {% include "wishlists/_reservations.html" %}
 
-    {% if not public_mode %}
+    {% if child_mode %}
+    {% if p.added_by_child %}
+    <footer class="product-actions">
+      <a href="{% url 'child_product_edit' token p.pk %}">Ändern</a>
+      <a class="danger-link" href="{% url 'child_product_delete' token p.pk %}">Wegnehmen</a>
+    </footer>
+    {% endif %}
+    {% elif not public_mode %}
     {% if can_edit or p.suggested_by == user and p.visibility != "visible" %}
     <footer class="product-actions">
       <a href="{% url 'product_edit' p.pk %}">Bearbeiten</a>

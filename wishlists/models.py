@@ -102,6 +102,7 @@ class Product(models.Model):
         related_name="suggested_products", verbose_name="Vorgeschlagen von",
     )
     visibility = models.CharField(max_length=10, choices=Visibility.choices, default=Visibility.VISIBLE)
+    added_by_child = models.BooleanField("Vom Kind selbst eingetragen", default=False)
     scrape_status = models.CharField(max_length=10, choices=ScrapeStatus.choices, blank=True, default="")
     scrape_error = models.CharField(max_length=300, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

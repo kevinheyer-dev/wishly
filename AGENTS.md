@@ -30,8 +30,11 @@ uv run python manage.py send_birthday_reminders         # cron alternative to Ce
 ## Code map
 
 - `accounts/` – `User` (AbstractUser), `FamilyGroup` + `Membership` (roles admin/member), `Profile`
-  (one per user, or a child profile without login with `guardians`), birthday reminders
+  (one per user, or a child profile without login with `guardians` and an optional secret
+  `child_token`), birthday reminders
   (`reminders.py`, `tasks.py`, command `send_birthday_reminders`)
+- `wishlists/child_views.py` – pages behind a child's secret link (`/kind/<token>/`): the child sees
+  its lists like a recipient and adds or changes only wishes with `added_by_child`
 - `wishlists/` – `Wishlist`, `Product` (a wish), `Reservation`; **all visibility rules live in
   `wishlists/access.py`** – views never decide on their own who sees what
 - `scraper/` – `fetch.py` (SSRF-safe download), `parse.py` (JSON-LD → shop selectors → OpenGraph),
@@ -42,8 +45,8 @@ uv run python manage.py send_birthday_reminders         # cron alternative to Ce
 ## Rules
 
 - Surprise protection is the core promise: the recipient (`Profile.user`) must never see
-  reservations, purchases or secret suggestions – not in lists, counts, the public page, mails or
-  messages. Guardians of a child profile are gift givers and do see them. Add a test for every
+  reservations, purchases or secret suggestions – not in lists, counts, the public page, the child
+  link, mails or messages. Guardians of a child profile are gift givers and do see them. Add a test for every
   new place that shows product or reservation data.
 - Every fetch of a user-supplied URL goes through `scraper.fetch.fetch_html` (blocks non-public
   addresses on every redirect hop).

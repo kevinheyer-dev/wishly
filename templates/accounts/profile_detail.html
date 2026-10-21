@@ -17,6 +17,31 @@
     {% endif %}
   </div>
 </div>
+{% if profile.is_child and can_manage %}
+<section class="card">
+  <h2>🧒 Kinder-Link</h2>
+  <p class="muted">Über diesen geheimen Link trägt {{ profile.name }} ohne Konto selbst Wünsche ein – zum Beispiel als
+    Lesezeichen auf dem Tablet. Reservierungen und geheime Vorschläge bleiben dort unsichtbar.
+    {% if profile.child_approval_required %}Neue Wünsche erscheinen erst nach deiner Freigabe.{% else %}Neue Wünsche stehen sofort auf der Liste.{% endif %}
+    <a href="{% url 'child_edit' profile.pk %}">Ändern</a></p>
+  {% if child_url %}
+  <div class="copy-row">
+    <input type="text" readonly value="{{ child_url }}" id="child-url">
+    <button class="btn" type="button" data-copy="#child-url">Kopieren</button>
+  </div>
+  <form method="post" action="{% url 'child_link' profile.pk %}" class="actions">
+    {% csrf_token %}
+    <button class="link" name="action" value="renew" data-confirm-click="Der bisherige Link funktioniert danach nicht mehr. Fortfahren?">Neuen Link erzeugen</button>
+    <button class="link danger-link" name="action" value="disable">Link abschalten</button>
+  </form>
+  {% else %}
+  <form method="post" action="{% url 'child_link' profile.pk %}">
+    {% csrf_token %}<button class="btn primary" name="action" value="renew">Kinder-Link erstellen</button>
+  </form>
+  {% endif %}
+</section>
+{% endif %}
+
 <div class="grid">
   {% for wishlist, count in wishlists %}
   {% include "wishlists/_wishlist_card.html" %}

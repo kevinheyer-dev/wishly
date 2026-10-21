@@ -1,0 +1,26 @@
+{% extends "child/base.html" %}
+{% block title %}{{ wishlist.title }}{% endblock %}
+{% block content %}
+<section class="list-hero">
+  <span class="list-kind">{{ wishlist.get_event_type_display }}{% if wishlist.event_date %} · {{ wishlist.event_date|date:"l, j. F Y" }}{% endif %}</span>
+  <h1>{{ wishlist.title }}</h1>
+  {% if has_more_lists %}<p><a href="{% url 'child_home' token %}">← Alle meine Listen</a></p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>✨ Neuer Wunsch</h2>
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    {{ form }}
+    <div class="actions"><button class="btn primary">Auf meine Liste!</button></div>
+  </form>
+</section>
+
+<section class="products">
+  {% for row in rows %}
+  {% include "wishlists/_product_card.html" with child_mode=True is_recipient=True can_edit=False %}
+  {% empty %}
+  <div class="card empty"><p>Hier ist noch nichts. Was wünschst du dir?</p></div>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -19,6 +19,7 @@ urlpatterns = [
     path("profile/<int:pk>/", views.profile_detail, name="profile_detail"),
     path("profile/<int:pk>/bearbeiten/", views.child_edit, name="child_edit"),
     path("profile/<int:pk>/loeschen/", views.child_delete, name="child_delete"),
+    path("profile/<int:pk>/kinder-link/", views.child_link, name="child_link"),
     path("konto/anmelden/", auth_views.LoginView.as_view(), name="login"),
     path("konto/abmelden/", auth_views.LogoutView.as_view(), name="logout"),
     path("konto/passwort/", auth_views.PasswordChangeView.as_view(), name="password_change"),

@@ -27,7 +27,7 @@ class OwnProfileForm(forms.ModelForm):
 class ChildProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ("name", "birth_day", "birth_month", "guardians")
+        fields = ("name", "birth_day", "birth_month", "guardians", "child_approval_required")
         widgets = {"guardians": forms.CheckboxSelectMultiple}
 
     def __init__(self, *args, group, **kwargs):

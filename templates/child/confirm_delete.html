@@ -1,0 +1,12 @@
+{% extends "child/base.html" %}
+{% block title %}Wunsch wegnehmen{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>„{{ object }}“ von deiner Liste nehmen?</h1>
+  <form method="post" class="actions">
+    {% csrf_token %}
+    <button class="btn danger">Ja, wegnehmen</button>
+    <a class="btn" href="{% url 'child_wishlist' token object.wishlist_id %}">Nein, behalten</a>
+  </form>
+</section>
+{% endblock %}

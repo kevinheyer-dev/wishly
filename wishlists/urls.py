@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import child_views, views
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
@@ -21,4 +21,11 @@ urlpatterns = [
     path("l/<uuid:public_id>/", views.public_wishlist, name="public_wishlist"),
     path("l/<uuid:public_id>/wunsch/<int:pk>/reservieren/", views.public_reserve, name="public_reserve"),
     path("l/<uuid:public_id>/reservierung/<int:pk>/aufheben/", views.public_unreserve, name="public_unreserve"),
+    path("kind/<str:token>/", child_views.child_home, name="child_home"),
+    path("kind/<str:token>/listen/<int:pk>/", child_views.child_wishlist, name="child_wishlist"),
+    path("kind/<str:token>/wuensche/<int:pk>/bearbeiten/", child_views.child_product_edit, name="child_product_edit"),
+    path("kind/<str:token>/wuensche/<int:pk>/loeschen/", child_views.child_product_delete,
+         name="child_product_delete"),
+    path("kind/<str:token>/wuensche/<int:pk>/status/", child_views.child_product_status,
+         name="child_product_status"),
 ]

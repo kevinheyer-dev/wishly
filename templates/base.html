@@ -6,10 +6,12 @@
   <title>{% block title %}wishly{% endblock %} · wishly</title>
   <link rel="stylesheet" href="{% static 'css/wishly.css' %}">
   <script src="{% static 'js/wishly.js' %}" defer></script>
+  {% block head %}{% endblock %}
 </head>
 <body class="theme-{% block theme %}{{ theme|default:season_theme }}{% endblock %}">
   <header class="topbar">
-    <a class="brand" href="{% url 'dashboard' %}">🎁 wishly</a>
+    <a class="brand" href="{% block brand_url %}{% url 'dashboard' %}{% endblock %}">🎁 wishly</a>
+    {% block nav %}
     {% if user.is_authenticated %}
     <nav class="nav">
       <a href="{% url 'dashboard' %}">Übersicht</a>
@@ -24,6 +26,7 @@
       {% if allow_signup %}<a href="{% url 'signup' %}">Registrieren</a>{% endif %}
     </nav>
     {% endif %}
+    {% endblock %}
   </header>
   <main class="page">
     {% for message in messages %}

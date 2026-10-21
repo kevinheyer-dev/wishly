@@ -1,5 +1,7 @@
 """Who may see and change what – the surprise protection lives here."""
 
+from django.db.models import Q
+
 from accounts.models import Profile
 
 from .models import Product, Wishlist
@@ -35,6 +37,13 @@ def visible_products(user, wishlist):
         return products
     pending_by_others = products.filter(visibility=Product.Visibility.PENDING).exclude(suggested_by=user)
     return products.exclude(pk__in=pending_by_others)
+
+
+def child_products(wishlist):
+    """What a child sees through its link: like a recipient, plus its own wishes awaiting approval."""
+    return wishlist.products.filter(
+        Q(visibility=Product.Visibility.VISIBLE) | Q(visibility=Product.Visibility.PENDING, added_by_child=True)
+    )
 
 
 def public_products(wishlist):

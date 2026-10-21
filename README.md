@@ -10,6 +10,11 @@ beschenkte Person sieht, was schon besorgt wurde.
   einen Einladungslink geteilt; Administratoren verwalten Mitglieder und Rollen.
 - **Kinderprofile** – Kinder brauchen kein Konto; ihre Erziehungsberechtigten pflegen die Listen
   und sehen (anders als bei eigenen Listen) auch die Reservierungen.
+- **Kinder-Link** – über einen geheimen Link (z. B. als Lesezeichen auf dem Tablet) tragen Kinder
+  ohne Konto selbst Wünsche ein und können ihre eigenen ändern oder wegnehmen. Reservierungen und
+  geheime Vorschläge sehen sie dort nicht. Pro Kind einstellbar: neue Wünsche erscheinen sofort
+  oder erst nach Freigabe durch die Erziehungsberechtigten. Der Link lässt sich erneuern und
+  abschalten.
 - **Geburtstage** – Tag und Monat im Profil; die Übersicht zeigt die nächsten 60 Tage, und die
   Familie bekommt rechtzeitig eine E-Mail (Standard: 14 Tage vorher).
 - **Wunschlisten** – nach Anlass, mit Datum und Beschreibung; das Design folgt dem Anlass oder der
