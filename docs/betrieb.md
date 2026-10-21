@@ -22,7 +22,22 @@ Alle Einstellungen kommen aus Umgebungsvariablen; Vorlage: [`.env.example`](../.
 | `WISHLY_SCRAPER_USER_AGENT` | User-Agent für den Abruf von Shopseiten |
 | `WISHLY_TIME_ZONE` | Standard `Europe/Berlin` |
 
-## Einrichtung
+## Docker
+
+`docker-compose.yml` bringt alles mit (web, worker, beat, PostgreSQL, Redis) – siehe README.
+Nützlich im Betrieb:
+
+```sh
+docker compose logs -f web worker            # Protokolle
+docker compose exec web python manage.py createsuperuser
+docker compose exec db pg_dump -U wishly wishly > wishly.sql   # Sicherung der Datenbank
+docker compose pull && docker compose up -d --build            # Aktualisieren
+```
+
+Alle Daten liegen in der Datenbank (Volume `db-data`); Redis hält nur die Warteschlange und
+braucht keine Sicherung.
+
+## Einrichtung ohne Docker
 
 ```sh
 uv sync --no-dev

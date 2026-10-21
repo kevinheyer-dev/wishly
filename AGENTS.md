@@ -25,7 +25,11 @@ uv run python manage.py makemigrations --check --dry-run   # must report "No cha
 uvx ruff check .                                        # lint (config in pyproject.toml)
 uv run celery -A config worker -B -l info               # needs CELERY_BROKER_URL
 uv run python manage.py send_birthday_reminders         # cron alternative to Celery beat
+docker compose up -d --build                            # full stack, needs .env (see .env.example)
 ```
+
+Migrations must also run on PostgreSQL (`docker compose up`), not only on the SQLite test
+database – e.g. adding a `SlugField` and making it unique later fails there.
 
 ## Code map
 

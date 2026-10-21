@@ -4,6 +4,8 @@
 
 ### Neu
 
+- Betrieb mit Docker: `docker-compose.yml` mit Webserver, Hintergrund-Worker, Zeitplaner,
+  PostgreSQL und Redis.
 - Konten mit Registrierung, Anmeldung, Passwort ändern und zurücksetzen.
 - Familien mit Einladungslink, Rollen (Administrator, Familienmitglied) und Kinderprofilen ohne
   eigenes Konto, die von Erziehungsberechtigten gepflegt werden.

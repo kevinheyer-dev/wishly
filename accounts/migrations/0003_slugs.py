@@ -18,6 +18,8 @@ def fill_slugs(apps, schema_editor):
         profile.save(update_fields=["slug"])
 
 
+# Added without an index first: on PostgreSQL the later unique=True would otherwise create the
+# "_like" index a second time.
 class Migration(migrations.Migration):
     dependencies = [
         ("accounts", "0002_child_link"),
@@ -27,13 +29,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="familygroup",
             name="slug",
-            field=models.SlugField(blank=True, default="", max_length=50),
+            field=models.SlugField(blank=True, db_index=False, default="", max_length=50),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name="profile",
             name="slug",
-            field=models.SlugField(blank=True, default="", max_length=50),
+            field=models.SlugField(blank=True, db_index=False, default="", max_length=50),
             preserve_default=False,
         ),
         migrations.RunPython(fill_slugs, migrations.RunPython.noop),

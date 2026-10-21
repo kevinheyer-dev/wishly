@@ -62,10 +62,20 @@ uv run python manage.py test                              # alle Tests
 uv run python manage.py makemigrations --check --dry-run  # Migrationen vollständig?
 ```
 
-## Betrieb
+## Betrieb mit Docker
 
-Siehe [docs/betrieb.md](docs/betrieb.md): Konfiguration, PostgreSQL, Redis, Celery,
-Erinnerungen, Reverse-Proxy.
+```sh
+cp .env.example .env   # mindestens DJANGO_SECRET_KEY und POSTGRES_PASSWORD setzen
+docker compose up -d --build
+```
+
+Danach läuft wishly unter http://localhost:8000 (Port über `APP_PORT`). Der Stack besteht aus
+`web` (gunicorn), `worker` (liest Shopseiten ein), `beat` (Geburtstags-Erinnerungen), `db`
+(PostgreSQL 17) und `redis`. Migrationen laufen beim Start von `web` automatisch; mit
+`DJANGO_SUPERUSER_USERNAME`/`_PASSWORD` wird beim ersten Start ein Admin-Konto angelegt.
+TLS übernimmt ein Reverse-Proxy davor (`DJANGO_BEHIND_HTTPS_PROXY=true`).
+
+Ohne Docker und alle Einstellungen im Detail: [docs/betrieb.md](docs/betrieb.md).
 
 ## Grenzen
 

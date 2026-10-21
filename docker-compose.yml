@@ -1,0 +1,106 @@
+# wishly – Wunschlisten für Familien
+#
+#   cp .env.example .env   # Werte anpassen, v. a. DJANGO_SECRET_KEY und POSTGRES_PASSWORD
+#   docker compose up -d --build
+#
+# Danach erreichbar unter http://localhost:8000 (Port über APP_PORT änderbar).
+
+x-app: &app
+  build: .
+  image: wishly:latest
+  restart: unless-stopped
+  environment: &app-env
+    DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY in .env setzen}
+    DJANGO_DEBUG: "false"
+    # 127.0.0.1 for the health check inside the container
+    DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost},127.0.0.1
+    DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:8000}
+    DJANGO_BEHIND_HTTPS_PROXY: ${DJANGO_BEHIND_HTTPS_PROXY:-false}
+    WISHLY_SITE_URL: ${WISHLY_SITE_URL:-http://localhost:8000}
+    WISHLY_ALLOW_SIGNUP: ${WISHLY_ALLOW_SIGNUP:-true}
+    WISHLY_BIRTHDAY_REMINDER_DAYS: ${WISHLY_BIRTHDAY_REMINDER_DAYS:-14}
+    WISHLY_AMAZON_TAG: ${WISHLY_AMAZON_TAG:-}
+    WISHLY_TIME_ZONE: ${WISHLY_TIME_ZONE:-Europe/Berlin}
+    POSTGRES_HOST: db
+    POSTGRES_DB: ${POSTGRES_DB:-wishly}
+    POSTGRES_USER: ${POSTGRES_USER:-wishly}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD in .env setzen}
+    CELERY_BROKER_URL: redis://redis:6379/0
+    EMAIL_HOST: ${EMAIL_HOST:-}
+    EMAIL_PORT: ${EMAIL_PORT:-587}
+    EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+    EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+    EMAIL_USE_TLS: ${EMAIL_USE_TLS:-true}
+    DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-wishly@localhost}
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-wishly}
+      POSTGRES_USER: ${POSTGRES_USER:-wishly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD in .env setzen}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    <<: *app
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      <<: *app-env
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME:-}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/konto/anmelden/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # Reads shop pages in the background
+  worker:
+    <<: *app
+    environment:
+      <<: *app-env
+      WISHLY_SKIP_MIGRATE: "1"
+    command: ["celery", "-A", "config", "worker", "-l", "info", "--concurrency", "2"]
+    depends_on:
+      web:
+        condition: service_healthy
+
+  # Starts the daily birthday reminders
+  beat:
+    <<: *app
+    environment:
+      <<: *app-env
+      WISHLY_SKIP_MIGRATE: "1"
+    command: ["celery", "-A", "config", "beat", "-l", "info", "--schedule", "/tmp/celerybeat-schedule"]
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  db-data:
