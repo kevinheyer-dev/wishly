@@ -31,14 +31,18 @@
 {% if can_edit and wishlist.public_enabled %}
 <section class="card">
   <h2>Öffentlicher Link</h2>
+  {% if public_url %}
   <p class="muted">Für alle außerhalb der Familie – sie können ohne Konto reservieren. Geheime Vorschläge erscheinen dort nicht.</p>
   <div class="copy-row">
     <input type="text" readonly value="{{ public_url }}" id="public-url">
     <button class="btn" type="button" data-copy="#public-url">Kopieren</button>
   </div>
-  <form method="post" action="{% url 'wishlist_new_link' wishlist.pk %}" data-confirm="Der bisherige Link funktioniert danach nicht mehr. Fortfahren?">
-    {% csrf_token %}<button class="link">Neuen Link erzeugen</button>
-  </form>
+  <p class="small muted">Kürzer: <a href="{{ profile_public_url }}">{{ profile_public_url }}</a> zeigt alle öffentlichen Listen von {{ wishlist.profile }}.
+    Die Namen im Link änderst du bei der <a href="{% url 'wishlist_edit' wishlist.pk %}">Liste</a>, beim Profil und bei der Familie.
+    Zurückziehen: „Öffentlicher Link aktiv“ ausschalten.</p>
+  {% else %}
+  <p class="muted">Öffentliche Links haben die Form <code>/familie/name/liste/</code> – dafür muss {{ wishlist.profile }} erst einer <a href="{% url 'group_list' %}">Familie</a> angehören.</p>
+  {% endif %}
 </section>
 {% endif %}
 

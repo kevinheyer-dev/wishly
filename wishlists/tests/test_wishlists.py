@@ -21,6 +21,9 @@ class FamilyTestCase(TestCase):
         )
         self.product = Product.objects.create(wishlist=self.wishlist, title="Buch", quantity_desired=2)
 
+    def public_args(self):
+        return [self.group.slug, self.anna.profile.slug, self.wishlist.slug]
+
     def detail(self, user):
         self.client.force_login(user)
         return self.client.get(reverse("wishlist_detail", args=[self.wishlist.pk]))
@@ -123,17 +126,17 @@ class ReservationTests(FamilyTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_guest_reserves_and_cancels_via_public_link(self):
-        url = reverse("public_reserve", args=[self.wishlist.public_id, self.product.pk])
+        url = reverse("public_reserve", args=[*self.public_args(), self.product.pk])
         self.client.post(url, {"guest_name": "Tante Erna", "quantity": 1})
         reservation = Reservation.objects.get()
         self.assertEqual(reservation.guest_name, "Tante Erna")
         self.assertContains(self.client.get(self.wishlist.get_public_url()), "Reservierung aufheben")
-        self.client.post(reverse("public_unreserve", args=[self.wishlist.public_id, reservation.pk]))
+        self.client.post(reverse("public_unreserve", args=[*self.public_args(), reservation.pk]))
         self.assertFalse(Reservation.objects.exists())
 
     def test_logged_in_outsider_reserves_via_public_link(self):
         self.client.force_login(self.stranger)
-        url = reverse("public_reserve", args=[self.wishlist.public_id, self.product.pk])
+        url = reverse("public_reserve", args=[*self.public_args(), self.product.pk])
         self.client.post(url, {"quantity": 1, "status": "reserved"})
         self.assertEqual(Reservation.objects.get().reserved_by, self.stranger)
 

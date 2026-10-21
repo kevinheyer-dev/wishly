@@ -21,13 +21,13 @@ class AccountForm(forms.ModelForm):
 class OwnProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ("birth_day", "birth_month", "birthday_reminders")
+        fields = ("slug", "birth_day", "birth_month", "birthday_reminders")
 
 
 class ChildProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ("name", "birth_day", "birth_month", "guardians", "child_approval_required")
+        fields = ("name", "slug", "birth_day", "birth_month", "guardians", "child_approval_required")
         widgets = {"guardians": forms.CheckboxSelectMultiple}
 
     def __init__(self, *args, group, **kwargs):
@@ -41,4 +41,4 @@ class ChildProfileForm(forms.ModelForm):
 class GroupForm(forms.ModelForm):
     class Meta:
         model = FamilyGroup
-        fields = ("name",)
+        fields = ("name", "slug")

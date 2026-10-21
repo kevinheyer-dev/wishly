@@ -6,13 +6,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from accounts.models import Profile
+from accounts.models import FamilyGroup, Profile
 from accounts.reminders import upcoming_birthdays
 from scraper.fetch import FetchError
 from scraper.tasks import scrape_product, scrape_url
@@ -141,6 +142,7 @@ def wishlist_detail(request, pk):
     user = request.user
     show_reservations = access.can_see_reservations(user, wishlist)
     products = access.visible_products(user, wishlist)
+    public_url = wishlist.get_public_url()
     rows = _product_rows(products.exclude(visibility=Product.Visibility.PENDING), user=user,
                          show_reservations=show_reservations)
     return render(request, "wishlists/wishlist_detail.html", {
@@ -151,7 +153,8 @@ def wishlist_detail(request, pk):
         "is_recipient": access.is_recipient(user, wishlist),
         "show_reservations": show_reservations,
         "theme": wishlist.resolved_theme(),
-        "public_url": request.build_absolute_uri(wishlist.get_public_url()),
+        "public_url": public_url and request.build_absolute_uri(public_url),
+        "profile_public_url": public_url and request.build_absolute_uri(wishlist.profile.get_public_url()),
     })
 
 
@@ -178,16 +181,6 @@ def wishlist_delete(request, pk):
         "warning": "Alle Wünsche und Reservierungen dieser Liste gehen verloren.",
         "cancel_url": wishlist.get_absolute_url(),
     })
-
-
-@login_required
-@require_POST
-def wishlist_new_link(request, pk):
-    wishlist = _wishlist_for_editor(request, pk)
-    wishlist.public_id = uuid.uuid4()
-    wishlist.save(update_fields=["public_id"])
-    messages.success(request, "Neuer öffentlicher Link erstellt – der alte funktioniert nicht mehr.")
-    return redirect(wishlist)
 
 
 @login_required
@@ -373,17 +366,49 @@ def _safe_next(request):
     return None
 
 
-def _public_wishlist(public_id):
-    return get_object_or_404(Wishlist.objects.select_related("profile__user"), public_id=public_id, public_enabled=True)
+def _public_profile(family_slug, profile_slug):
+    """The profile behind /<family>/<profile>/ – only if it really belongs to that family."""
+    family = get_object_or_404(FamilyGroup, slug=family_slug)
+    profile = get_object_or_404(
+        Profile.objects.select_related("user").filter(
+            Q(family_group=family) | Q(user__memberships__group=family)
+        ).distinct(),
+        slug=profile_slug,
+    )
+    return family, profile
 
 
-def public_wishlist(request, public_id):
-    wishlist = _public_wishlist(public_id)
+def _public_wishlist(family_slug, profile_slug, list_slug):
+    family, profile = _public_profile(family_slug, profile_slug)
+    wishlist = get_object_or_404(profile.wishlists.select_related("profile__user"), slug=list_slug,
+                                 public_enabled=True)
+    return family, wishlist
+
+
+def _public_list_url(family, wishlist):
+    return reverse("public_wishlist", args=[family.slug, wishlist.profile.slug, wishlist.slug])
+
+
+def public_profile(request, family, profile):
+    family, profile = _public_profile(family, profile)
+    wishlists = list(profile.wishlists.filter(public_enabled=True))
+    if not wishlists:
+        raise Http404
+    if len(wishlists) == 1:
+        return redirect(_public_list_url(family, wishlists[0]))
+    return render(request, "wishlists/public_profile.html", {
+        "family": family, "profile": profile, "wishlists": wishlists,
+    })
+
+
+def public_wishlist(request, family, profile, wishlist):
+    family, wishlist = _public_wishlist(family, profile, wishlist)
     show_reservations = access.can_see_reservations(request.user, wishlist)
     guest_key = request.session.get(GUEST_SESSION_KEY)
     rows = _product_rows(access.public_products(wishlist), user=request.user, guest_key=guest_key,
                          show_reservations=show_reservations)
     return render(request, "wishlists/public_wishlist.html", {
+        "family": family,
         "wishlist": wishlist,
         "rows": rows,
         "show_reservations": show_reservations,
@@ -393,8 +418,8 @@ def public_wishlist(request, public_id):
 
 
 @require_POST
-def public_reserve(request, public_id, pk):
-    wishlist = _public_wishlist(public_id)
+def public_reserve(request, family, profile, wishlist, pk):
+    family, wishlist = _public_wishlist(family, profile, wishlist)
     product = get_object_or_404(access.public_products(wishlist), pk=pk)
     if access.is_recipient(request.user, wishlist):
         raise PermissionDenied
@@ -409,16 +434,16 @@ def public_reserve(request, public_id, pk):
             request.session[GUEST_SESSION_KEY] = guest_key
     if reservation:
         messages.success(request, f"Danke! „{product}“ ist für dich reserviert.")
-    return redirect(wishlist.get_public_url())
+    return redirect(_public_list_url(family, wishlist))
 
 
 @require_POST
-def public_unreserve(request, public_id, pk):
-    wishlist = _public_wishlist(public_id)
+def public_unreserve(request, family, profile, wishlist, pk):
+    family, wishlist = _public_wishlist(family, profile, wishlist)
     guest_key = request.session.get(GUEST_SESSION_KEY)
     if not guest_key:
         raise Http404
     reservation = get_object_or_404(Reservation, pk=pk, guest_key=guest_key, product__wishlist=wishlist)
     reservation.delete()
     messages.success(request, "Reservierung aufgehoben.")
-    return redirect(wishlist.get_public_url())
+    return redirect(_public_list_url(family, wishlist))

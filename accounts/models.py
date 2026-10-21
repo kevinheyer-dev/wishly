@@ -9,6 +9,8 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 
+from .slugs import RESERVED, unique_slug, validate_not_reserved
+
 MONTHS = [
     (1, "Januar"), (2, "Februar"), (3, "März"), (4, "April"), (5, "Mai"), (6, "Juni"),
     (7, "Juli"), (8, "August"), (9, "September"), (10, "Oktober"), (11, "November"), (12, "Dezember"),
@@ -26,6 +28,10 @@ class User(AbstractUser):
 
 class FamilyGroup(models.Model):
     name = models.CharField("Name", max_length=100)
+    slug = models.SlugField(
+        "Name in Links", max_length=50, unique=True, blank=True, validators=[validate_not_reserved],
+        help_text="Erster Teil der öffentlichen Links, z. B. „mueller“. Leer lassen = aus dem Namen.",
+    )
     invite_token = models.CharField(max_length=40, unique=True, default=new_invite_token)
     created_at = models.DateTimeField(auto_now_add=True)
     members = models.ManyToManyField(
@@ -42,6 +48,12 @@ class FamilyGroup(models.Model):
 
     def get_absolute_url(self):
         return reverse("group_detail", args=[self.pk])
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            others = FamilyGroup.objects.exclude(pk=self.pk)
+            self.slug = unique_slug(others, self.name, "familie", reserved=RESERVED)
+        super().save(*args, **kwargs)
 
     def is_admin(self, user):
         return self.memberships.filter(user=user, role=Membership.Role.ADMIN).exists()
@@ -91,6 +103,11 @@ class Profile(models.Model):
     name = models.CharField(
         "Name", max_length=100, blank=True, help_text="Für Kinderprofile; bei Konten der Name des Kontos."
     )
+    # Unique across all families: adults belong to several, so a per-family name could clash on joining
+    slug = models.SlugField(
+        "Name in Links", max_length=50, unique=True, blank=True,
+        help_text="Zweiter Teil der öffentlichen Links, z. B. „anna“. Leer lassen = aus dem Namen.",
+    )
     # Children belong to one group; adults reach their groups through Membership
     family_group = models.ForeignKey(
         FamilyGroup, null=True, blank=True, on_delete=models.CASCADE, related_name="child_profiles"
@@ -131,6 +148,23 @@ class Profile(models.Model):
 
     def get_absolute_url(self):
         return reverse("profile_detail", args=[self.pk])
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            source = (self.user.first_name or self.user.username) if self.user_id else self.name
+            self.slug = unique_slug(Profile.objects.exclude(pk=self.pk), source, "profil")
+        super().save(*args, **kwargs)
+
+    def public_family(self):
+        """The family that appears in this profile's public links."""
+        if self.is_child:
+            return self.family_group
+        membership = self.user.memberships.select_related("group").order_by("joined_at").first()
+        return membership.group if membership else None
+
+    def get_public_url(self):
+        family = self.public_family()
+        return reverse("public_profile", args=[family.slug, self.slug]) if family else None
 
     @property
     def display_name(self):

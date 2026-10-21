@@ -27,8 +27,12 @@ beschenkte Person sieht, was schon besorgt wurde.
   Vorschläge, auch nicht über den öffentlichen Link.
 - **Vorschläge** – Familienmitglieder schlagen Wünsche vor: *zur Bestätigung* (erscheint erst nach
   Annahme) oder *geheim* (für alle außer der beschenkten Person sichtbar).
-- **Öffentlicher Link** – pro Liste zuschaltbar und jederzeit erneuerbar; Gäste reservieren ohne
-  Konto mit ihrem Namen.
+- **Öffentlicher Link** – pro Liste zuschaltbar, gut zu merken: `/<familie>/<name>/` zeigt alle
+  öffentlichen Listen einer Person (bei nur einer direkt diese), `/<familie>/<name>/<liste>/` eine
+  bestimmte, z. B. `/mueller/anna/weihnachten-2026/`. Die Namen entstehen automatisch (Umlaute
+  als ae/oe/ue/ss) und lassen sich bei Familie, Profil und Liste ändern. Gäste reservieren ohne
+  Konto mit ihrem Namen. Weil solche Links erratbar sind, gilt eine öffentliche Liste als
+  öffentlich – zurückgezogen wird sie, indem man den öffentlichen Link abschaltet.
 - **Link einfügen genügt** – oben auf der eigenen Liste reicht ein Shop-Link: Name, Bild, Preis
   und Beschreibung kommen aus der Shopseite (strukturierte Daten, OpenGraph, Amazon), was nicht
   gefunden wird, bleibt leer. Im ausführlichen Formular (auch beim Kinder-Link) werden die Felder
@@ -64,6 +68,11 @@ Siehe [docs/betrieb.md](docs/betrieb.md): Konfiguration, PostgreSQL, Redis, Cele
 Erinnerungen, Reverse-Proxy.
 
 ## Grenzen
+
+- Namen von Profilen sind über alle Familien hinweg eindeutig (Erwachsene können in mehreren
+  Familien sein) – die zweite Anna heißt in Links `anna-2`, bis man es ändert. Gehört eine Person
+  mehreren Familien an, steht in ihren Links die Familie, der sie zuerst beigetreten ist; die
+  Links funktionieren aber mit jeder ihrer Familien.
 
 - Manche Shops (z. B. Thalia, LEGO, Galaxus) sperren automatische Abrufe mit einem Bot-Schutz.
   Dann bleibt der Wunsch mit dem Link bestehen und Titel, Bild und Preis werden von Hand

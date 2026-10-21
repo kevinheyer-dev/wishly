@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Wunschlisten von {{ profile }}{% endblock %}
+{% block content %}
+<h1>Wunschlisten von {{ profile }}</h1>
+<div class="grid">
+  {% for wishlist in wishlists %}
+  <a class="card link-card list-card theme-{{ wishlist.resolved_theme }}" href="{% url 'public_wishlist' family.slug profile.slug wishlist.slug %}">
+    <span class="list-kind">{{ wishlist.get_event_type_display }}{% if wishlist.event_date %} · {{ wishlist.event_date|date:"j. F Y" }}{% endif %}</span>
+    <h2>{{ wishlist.title }}</h2>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

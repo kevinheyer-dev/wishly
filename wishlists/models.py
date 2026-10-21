@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -8,6 +7,7 @@ from django.db.models import Sum
 from django.urls import reverse
 
 from accounts.models import Profile
+from accounts.slugs import unique_slug
 
 from .context_processors import SEASONS
 
@@ -38,10 +38,13 @@ class Wishlist(models.Model):
     event_date = models.DateField("Datum des Anlasses", null=True, blank=True)
     description = models.TextField("Beschreibung", blank=True)
     theme = models.CharField("Design", max_length=20, choices=Theme.choices, default=Theme.AUTO)
-    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    slug = models.SlugField(
+        "Name in Links", max_length=50, blank=True,
+        help_text="Letzter Teil des öffentlichen Links, z. B. „weihnachten-2026“. Leer lassen = aus dem Titel.",
+    )
     public_enabled = models.BooleanField(
         "Öffentlicher Link aktiv", default=False,
-        help_text="Jeder mit dem Link kann die Liste sehen und Wünsche reservieren.",
+        help_text="Jeder, der den Link kennt oder errät, kann die Liste sehen und Wünsche reservieren.",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -50,6 +53,10 @@ class Wishlist(models.Model):
         ordering = ["event_date", "title"]
         verbose_name = "Wunschliste"
         verbose_name_plural = "Wunschlisten"
+        constraints = [
+            models.UniqueConstraint(fields=["profile", "slug"], name="unique_wishlist_slug",
+                                    violation_error_message="Diesen Namen hat schon eine andere Liste."),
+        ]
 
     def __str__(self):
         return f"{self.title} ({self.profile})"
@@ -57,8 +64,15 @@ class Wishlist(models.Model):
     def get_absolute_url(self):
         return reverse("wishlist_detail", args=[self.pk])
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            others = Wishlist.objects.filter(profile_id=self.profile_id).exclude(pk=self.pk)
+            self.slug = unique_slug(others, self.title, "liste")
+        super().save(*args, **kwargs)
+
     def get_public_url(self):
-        return reverse("public_wishlist", args=[self.public_id])
+        family = self.profile.public_family()
+        return reverse("public_wishlist", args=[family.slug, self.profile.slug, self.slug]) if family else None
 
     def resolved_theme(self, today=None):
         if self.theme != self.Theme.AUTO:

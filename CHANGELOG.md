@@ -16,7 +16,8 @@
 - Vorschläge von Familienmitgliedern: zur Bestätigung oder geheim.
 - Kinder-Link: Kinder tragen ohne Konto selbst Wünsche ein; Freigabe durch die
   Erziehungsberechtigten pro Kind einstellbar.
-- Öffentlicher Link pro Liste; Gäste reservieren ohne Konto.
+- Öffentlicher Link pro Liste mit gut merkbarer Adresse `/<familie>/<name>/<liste>/`; Gäste
+  reservieren ohne Konto.
 - Produktdaten werden aus dem Shop-Link gelesen (im Hintergrund über Celery).
 - Wunsch nur per Link anlegen; im Formular werden Name, Bild, Preis und Beschreibung schon beim
   Einfügen des Links ausgefüllt. „Neu einlesen“ übernimmt alle Angaben neu aus dem Link.

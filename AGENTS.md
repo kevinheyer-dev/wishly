@@ -52,6 +52,8 @@ uv run python manage.py send_birthday_reminders         # cron alternative to Ce
   addresses on every redirect hop).
 - Stored shop URLs stay clean; affiliate tags are only added when rendering.
 - UI text and URLs are German, code, comments and commit messages English.
+- Public links are `/<family>/<profile>/<list>/` (slugs, `accounts/slugs.py`) and are matched
+  last. A new top-level path segment must be added to `RESERVED` there, or a family could shadow it.
 - Redirect targets from requests (`next`) are checked with `url_has_allowed_host_and_scheme`.
 - Keep it small: no new dependencies or frameworks without a reason; match the existing style.
 - Record user-visible changes in `CHANGELOG.md` (German).

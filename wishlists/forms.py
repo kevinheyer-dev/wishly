@@ -8,7 +8,7 @@ from .models import Product, Reservation, Wishlist
 class WishlistForm(forms.ModelForm):
     class Meta:
         model = Wishlist
-        fields = ("profile", "title", "event_type", "event_date", "description", "theme", "public_enabled")
+        fields = ("profile", "title", "event_type", "event_date", "description", "theme", "public_enabled", "slug")
         widgets = {
             "event_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "description": forms.Textarea(attrs={"rows": 3}),
