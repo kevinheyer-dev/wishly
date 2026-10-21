@@ -2,6 +2,8 @@
 name = "wishly"
 version = "0.1.0"
 description = "Wunschlisten für Familien und Freundeskreise"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.13"
 dependencies = [
     "beautifulsoup4>=4.15.0",

@@ -90,3 +90,8 @@ Ohne Docker und alle Einstellungen im Detail: [docs/betrieb.md](docs/betrieb.md)
   einen Browser auf dem Server.
 - Der Preisvergleich ist ein Suchlink, kein automatischer Abgleich.
 - Produktbilder werden direkt vom Shop geladen, nicht auf dem Server gespeichert.
+
+## Lizenz
+
+MIT – siehe [LICENSE](LICENSE). Nutzen, ändern und weitergeben ist ausdrücklich erlaubt, auch
+kommerziell; nur der Lizenzhinweis muss erhalten bleiben.
