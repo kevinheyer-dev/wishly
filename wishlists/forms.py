@@ -59,7 +59,7 @@ class ChildProductForm(ProductForm):
             "shop_url": "Link (wenn du einen hast)",
             "priority": "Wie sehr wünschst du es dir?",
             "quantity_desired": "Wie viele?",
-            "notes": "Noch etwas wichtig? (Größe, Farbe …)",
+            "notes": "Noch etwas wichtig, z. B. Größe oder Farbe?",
         }
         widgets = {
             "title": forms.TextInput(attrs={"autofocus": True}),
@@ -68,7 +68,7 @@ class ChildProductForm(ProductForm):
                                               (2, "★★ Ein bisschen"), (1, "★ Wäre nett")]),
             "notes": forms.Textarea(attrs={"rows": 2}),
         }
-        help_texts = {"shop_url": "", "priority": ""}
+        help_texts = {"shop_url": "", "priority": "", "notes": ""}
 
 
 class SuggestionForm(ProductForm):

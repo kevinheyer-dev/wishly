@@ -11,7 +11,7 @@
 {% endif %}
 
 {% if pending_suggestions %}
-<div class="card hint">📬 Es gibt {{ pending_suggestions }} neue{{ pending_suggestions|pluralize:"n" }} Vorschl{{ pending_suggestions|pluralize:"ag,äge" }} für deine Listen – du findest sie oben auf der jeweiligen Liste.</div>
+<div class="card hint">📬 {% if pending_suggestions == 1 %}Ein neuer Vorschlag wartet{% else %}{{ pending_suggestions }} neue Vorschläge warten{% endif %} auf deine Freigabe – du findest {% if pending_suggestions == 1 %}ihn{% else %}sie{% endif %} oben auf der jeweiligen Liste.</div>
 {% endif %}
 
 <div class="dashboard">
@@ -52,7 +52,7 @@
     </section>
     <section class="card">
       <h2>🛍️ Besorgungen</h2>
-      <p>{% if open_reservations %}{{ open_reservations }} reservierte{{ open_reservations|pluralize:"r," }} Wunsch{{ open_reservations|pluralize:"e" }} noch nicht gekauft.{% else %}Nichts offen.{% endif %}</p>
+      <p>{% if open_reservations %}{% if open_reservations == 1 %}Ein reservierter Wunsch ist{% else %}{{ open_reservations }} reservierte Wünsche sind{% endif %} noch nicht gekauft.{% else %}Nichts offen.{% endif %}</p>
       <a href="{% url 'my_reservations' %}">Alle Reservierungen →</a>
     </section>
   </aside>

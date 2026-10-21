@@ -185,3 +185,13 @@ class WishlistViewTests(FamilyTestCase):
         self.assertEqual(wishlist.resolved_theme(), "christmas")
         wishlist.theme = Wishlist.Theme.PLAIN
         self.assertEqual(wishlist.resolved_theme(), "plain")
+
+
+class WordingTests(FamilyTestCase):
+    def test_plural_forms(self):
+        Product.objects.create(wishlist=self.wishlist, title="Zweites")
+        self.client.force_login(self.ben)
+        response = self.client.get(reverse("dashboard"))
+        self.assertContains(response, "2 Wünsche")
+        Product.objects.filter(title="Zweites").delete()
+        self.assertContains(self.client.get(reverse("dashboard")), "1 Wunsch")

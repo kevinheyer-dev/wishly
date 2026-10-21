@@ -1,5 +1,5 @@
 <a class="card link-card list-card theme-{{ wishlist.resolved_theme }}" href="{{ wishlist.get_absolute_url }}">
   <span class="list-kind">{{ wishlist.get_event_type_display }}{% if wishlist.event_date %} · {{ wishlist.event_date|date:"j. F Y" }}{% endif %}</span>
   <h2>{{ wishlist.title }}</h2>
-  <p class="muted">für {{ wishlist.profile }} · {{ count }} Wunsch{{ count|pluralize:"e" }}</p>
+  <p class="muted">für {{ wishlist.profile }} · {{ count }} {% if count == 1 %}Wunsch{% else %}Wünsche{% endif %}</p>
 </a>

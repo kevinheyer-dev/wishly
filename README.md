@@ -4,6 +4,27 @@ Wunschlisten für Familien und Freundeskreise: Listen für Geburtstag, Weihnacht
 Babyparty anlegen, mit der Familie oder per Link teilen und Geschenke reservieren – ohne dass die
 beschenkte Person sieht, was schon besorgt wurde.
 
+## Screenshots
+
+![Übersicht mit Listen, nächsten Geburtstagen und Besorgungen](docs/screenshots/uebersicht.png)
+
+![Eine Wunschliste aus Sicht der Familie: wer was reserviert oder gekauft hat, dazu ein geheimer Vorschlag](docs/screenshots/liste-familie.png)
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/screenshots/liste-beschenkte.png" alt="Die eigene Liste mit Link-Feld und Überraschungsschutz"></td>
+    <td width="33%"><img src="docs/screenshots/kinder-link.png" alt="Kinder-Link: Mia trägt selbst Wünsche ein"></td>
+    <td width="33%"><img src="docs/screenshots/oeffentlich.png" alt="Öffentlicher Link für Gäste ohne Konto"></td>
+  </tr>
+  <tr>
+    <td>Die eigene Liste: Link einfügen genügt, Reservierungen bleiben verborgen.</td>
+    <td>Kinder-Link: Kinder tragen ohne Konto selbst Wünsche ein.</td>
+    <td>Öffentlicher Link: Gäste reservieren ohne Konto.</td>
+  </tr>
+</table>
+
+Die Produktbilder in den Screenshots stammen von Wikimedia Commons und sind gemeinfrei bzw. CC0.
+
 ## Funktionen
 
 - **Konten und Familien** – Registrierung, Anmeldung, Passwort zurücksetzen. Familien werden über

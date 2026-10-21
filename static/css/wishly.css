@@ -98,8 +98,10 @@ img { max-width: 100%; }
 .hero, .list-hero { position: relative; overflow: hidden; background: var(--hero); color: var(--hero-ink);
   border-radius: var(--radius); padding: 1.4rem 1.2rem; margin-bottom: 1rem; }
 .hero::after, .list-hero::after { content: var(--decor); position: absolute; right: 0.8rem; bottom: -0.6rem;
-  font-size: 4.5rem; opacity: 0.35; pointer-events: none; }
-.list-hero a { color: inherit; }
+  font-size: 3rem; opacity: 0.3; pointer-events: none; }
+@media (min-width: 640px) { .hero::after, .list-hero::after { font-size: 4.5rem; } }
+.list-hero a:not(.btn) { color: inherit; }
+.hero > *, .list-hero > * { position: relative; z-index: 1; }
 .list-hero .list-kind { color: inherit; opacity: 0.8; }
 .hero h1 { font-size: 1.9rem; }
 
