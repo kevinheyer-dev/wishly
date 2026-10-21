@@ -4,6 +4,8 @@
 
 ### Neu
 
+- Docker-Image `ghcr.io/kevinheyer-dev/wishly` wird für jeden Versions-Tag (`v1.2.3`) gebaut
+  und veröffentlicht (amd64, arm64).
 - Betrieb mit Docker: `docker-compose.yml` mit Webserver, Hintergrund-Worker, Zeitplaner,
   PostgreSQL und Redis.
 - Konten mit Registrierung, Anmeldung, Passwort ändern und zurücksetzen.
